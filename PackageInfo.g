@@ -36,8 +36,7 @@ Persons := [
 #IssueTrackerURL := "TODO",
 #SupportEmail := "TODO",
 
-PackageWWWHome :=
-  Concatenation( "https://gap-packages.github.io/", LowercaseString( ~.PackageName ) ),
+PackageWWWHome :="https://gap-packages.github.io/InduceReduce",
 
 PackageInfoURL := Concatenation( ~.PackageWWWHome, "/PackageInfo.g" ),
 README_URL     := Concatenation( ~.PackageWWWHome, "/README.md" ),
