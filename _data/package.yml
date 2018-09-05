@@ -19,13 +19,13 @@ needed-pkgs:
       version: ">= 1.5"
       url: "http://www.math.rwth-aachen.de/~Frank.Luebeck/GAPDoc"
 
-www: https://jonathan-144.github.io/inducereduce
+www: https://jonathan-144.github.io/InduceReduce
 readme: README.md
-packageinfo: https://jonathan-144.github.io/inducereduce/PackageInfo.g
+packageinfo: https://jonathan-144.github.io/InduceReduce/PackageInfo.g
 
 downloads:
     - name: .tar.gz
-      url: https://jonathan-144.github.io/inducereduce/InduceReduce-1.0.tar.gz
+      url: https://jonathan-144.github.io/InduceReduce/InduceReduce-1.0.tar.gz
 
 abstract: |
     This package provides an implementation of Unger's algorithm to compute the character table of a finite group.
@@ -42,7 +42,7 @@ citeas: |
              Version 1.0</i>
      (<span class='BibYear'>2018</span>)<br />
     (<span class='BibNote'>GAP package</span>),
-    <span class='BibHowpublished'><a href="https://jonathan-144.github.io/inducereduce">https://jonathan-144.github.io/inducereduce</a></span>.
+    <span class='BibHowpublished'><a href="https://jonathan-144.github.io/InduceReduce">https://jonathan-144.github.io/InduceReduce</a></span>.
     </p>
     
 
@@ -54,9 +54,9 @@ bibtex: |
       month =            {Sep},
       year =             {2018},
       note =             {GAP package},
-      howpublished =     {\href    {https://jonathan-144.github.io/inducereduce}
+      howpublished =     {\href    {https://jonathan-144.github.io/InduceReduce}
                           {\texttt{https://jonathan-144.github.io/}\discretionary
-                          {}{}{}\texttt{inducereduce}}},
+                          {}{}{}\texttt{InduceReduce}}},
       keywords =         {character   table;   elementary   subgroups;   induced
                           characters},
       printedkey =       {Gru18}
