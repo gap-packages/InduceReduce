@@ -1,101 +1,86 @@
 #############################################################################
 ##  
-##  Demo PackageInfo.g for the GitHubPagesForGAP
+##  PackageInfo.g for the package `InduceReduce'              Jonathan Gruber
+##                                                            
+##  This file contains meta-information on the package. It is used by
+##  the package loading mechanism and the upgrade mechanism for the
+##  redistribution of the package via the GAP website.
 ##
 
 SetPackageInfo( rec(
 
-PackageName := "GitHubPagesForGAP",
-
-Subtitle := "A GitHub Pages generator for GAP packages",
-Version := "0.2",
-Date := "04/02/2017", # dd/mm/yyyy format
+PackageName := "InduceReduce",
+Subtitle := "Unger's algorithm to compute charater tables of finite groups",
+Version := "1.0",
+Date := "04/09/2018", # dd/mm/yyyy format
 
 Persons := [
   rec(
-    LastName      := "Horn",
-    FirstNames    := "Max",
-    IsAuthor      := true,
-    IsMaintainer  := true,
-    Email         := "max.horn@math.uni-giessen.de",
-    WWWHome       := "http://www.quendi.de/math",
-    PostalAddress := Concatenation(
-                       "AG Algebra\n",
-                       "Mathematisches Institut\n",
-                       "Justus-Liebig-Universität Gießen\n",
-                       "Arndtstraße 2\n",
-                       "35392 Gießen\n",
-                       "Germany" ),
-    Place         := "Gießen",
-    Institution   := "Justus-Liebig-Universität Gießen"
-  ),
-
-  rec(
-    LastName      := "Thor",
-    FirstNames    := "A. U.",
-    IsAuthor      := true,
-    IsMaintainer  := false,
-    #Email         := "author@example.com",
-  ),
-
-  rec(
-    LastName      := "Itor",
-    FirstNames    := "Jan",
-    IsAuthor      := false,
-    IsMaintainer  := true,
-    #Email         := "janitor@example.com",
+    IsAuthor := true,
+    IsMaintainer := true,
+    FirstNames := "Jonathan",
+    LastName := "Gruber",
+    Email := "gruber@mathemaik.uni-kl.de",
+    PostalAddress := Concatenation( [
+                       "Fachbereich Mathematik\n",
+                       "Technische Universität Kaiserslautern\n",
+                       "Erwin Schrödinger Straße\n",
+						"67663 Kaiserslautern\n",
+                       "Germany" ] ),
+    Place := "Kaiserslautern",
+    Institution := "TU Kaiserslautern",
   ),
 ],
 
-Status := "other",
+#SourceRepository := rec( Type := "TODO", URL := "URL" ),
+#IssueTrackerURL := "TODO",
+#SupportEmail := "TODO",
 
-# The following are not strictly necessary in your own PackageInfo.g
-# (in the sense that update.g only looks at the usual fields
-# like PackageWWWHome, ArchiveURL etc.). But they are convenient
-# if you use exactly the scheme for your package website that we propose.
-GithubUser := "gap-system",
-GithubRepository := ~.PackageName,
-GithubWWW := Concatenation("https://github.com/", ~.GithubUser, "/", ~.GithubRepository),
+PackageWWWHome :="https://jonathan-144.github.io/InduceReduce",
 
-PackageWWWHome := Concatenation("https://", ~.GithubUser, ".github.io/", ~.GithubRepository, "/"),
-README_URL     := Concatenation( ~.PackageWWWHome, "README.md" ),
-PackageInfoURL := Concatenation( ~.PackageWWWHome, "PackageInfo.g" ),
-# The following assumes you are using the Github releases system. If not, adjust
-# it accordingly.
-ArchiveURL     := Concatenation(~.GithubWWW,
-                    "/releases/download/v", ~.Version, "/",
-                    ~.GithubRepository, "-", ~.Version),
+PackageInfoURL := Concatenation( ~.PackageWWWHome, "/PackageInfo.g" ),
+README_URL     := Concatenation( ~.PackageWWWHome, "/README.md" ),
+ArchiveURL     := Concatenation( ~.PackageWWWHome,
+                                 "/", ~.PackageName, "-", ~.Version ),
 
-ArchiveFormats := ".tar.gz .tar.bz2",
+ArchiveFormats := ".tar.gz",
 
-AbstractHTML := 
-  "This is a pseudo package that contains no actual\
-  <span class=\"pkgname\">GAP</span> code. Instead, it is a template for other\
-  GAP packages that allows to quickly setup GitHub Pages.",
+##  Status information. Currently the following cases are recognized:
+##    "accepted"      for successfully refereed packages
+##    "submitted"     for packages submitted for the refereeing
+##    "deposited"     for packages for which the GAP developers agreed
+##                    to distribute them with the core GAP system
+##    "dev"           for development versions of packages
+##    "other"         for all other packages
+##
+Status := "dev",
+
+AbstractHTML   :=  "This package provides an implementation of Unger's algorithm\
+ to compute the character table of a finite group.",
 
 PackageDoc := rec(
-  BookName  := "GitHubPagesForGAP",
+  BookName  := "InduceReduce",
   ArchiveURLSubset := ["doc"],
   HTMLStart := "doc/chap0.html",
   PDFFile   := "doc/manual.pdf",
   SixFile   := "doc/manual.six",
-  LongTitle := "A GitHub Pages generator for GAP packages",
+  LongTitle := "Computing Character Tables using Unger's algorithm",
 ),
 
-# The following dependencies are fake and for testing / demo purposes
 Dependencies := rec(
-  GAP := ">=4.8.1",
-  NeededOtherPackages := [
-    ["GAPDoc", ">= 1.2"],
-    ["IO", ">= 4.1"],
-  ],
-  SuggestedOtherPackages := [["orb", ">= 4.2"]],
-  ExternalConditions := []
+  GAP := ">= 4.0",
+  NeededOtherPackages := [ [ "GAPDoc", ">= 1.5" ] ],
+  SuggestedOtherPackages := [ ],
+  ExternalConditions := [ ],
 ),
 
-AvailabilityTest := ReturnTrue,
+AvailabilityTest := function()
+        return true;
+    end,
 
-Keywords := ["GitHub Pages", "GAP"]
+TestFile := "tst/testall.g",
+
+Keywords := [ "character table", "elementary subgroups", "induced characters" ],
 
 ));
 
