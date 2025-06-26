@@ -10,7 +10,7 @@
 SetPackageInfo( rec(
 
 PackageName := "InduceReduce",
-Subtitle := "Unger's algorithm to compute charater tables of finite groups",
+Subtitle := "Unger's algorithm to compute character tables of finite groups",
 Version := "1.0",
 Date := "04/09/2018", # dd/mm/yyyy format
 
