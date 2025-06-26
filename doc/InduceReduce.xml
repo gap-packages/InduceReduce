@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!DOCTYPE Book SYSTEM "gapdoc.dtd">
+<!DOCTYPE Book SYSTEM "gapdoc.dtd"
+    [
+      <#Include SYSTEM "_entities.xml">
+    ] >
 
 <Book Name="InduceReduce">
 
 <TitlePage>
 	<Title>The <Package>InduceReduce</Package> Package</Title>
-	<Version>Version 1.0</Version>
+	<Version>Version &VERSION;</Version>
+	<Date>&RELEASEDATE;</Date>
 	<Author>Jonathan Gruber
 		<Email>gruber@mathematik.uni-kl.de</Email>
 	</Author>
@@ -16,7 +20,7 @@
     &copyright; 2018 by Jonathan Gruber<P/>
     The <Package>InduceReduce</Package> package is free software; 
     you can redistribute it and/or modify it under the terms of the 
-    <URL Text="GNU General Public License">http://www.fsf.org/licenses/gpl.html</URL> 
+    <URL Text="GNU General Public License">https://www.fsf.org/licenses/gpl.html</URL>
     as published by the Free Software Foundation; either version 3 of the License, 
     or (at your option) any later version.
 </Copyright>

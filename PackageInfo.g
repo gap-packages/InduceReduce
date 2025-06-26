@@ -82,6 +82,22 @@ TestFile := "tst/testall.g",
 
 Keywords := [ "character table", "elementary subgroups", "induced characters" ],
 
+AutoDoc := rec(
+    entities := rec(
+        VERSION := ~.Version,
+        RELEASEYEAR := ~.Date{[7..10]},
+        RELEASEDATE := function(date)
+          local day, month, year, allMonths;
+          day := Int(date{[1,2]});
+          month := Int(date{[4,5]});
+          year := Int(date{[7..10]});
+          allMonths := [ "January", "February", "March", "April", "May", "June", "July",
+                         "August", "September", "October", "November", "December"];
+          return Concatenation(String(day)," ", allMonths[month], " ", String(year));
+        end(~.Date),
+    ),
+),
+
 ));
 
 
