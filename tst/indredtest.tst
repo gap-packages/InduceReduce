@@ -1,55 +1,51 @@
-#############################################################################
-##
-#A  recipe.tst            Example package                Alexander Konovalov
-##
-##  To create a test file, place GAP prompts, input and output exactly as
-##  they must appear in the GAP session. Do not remove lines containing 
-##  START_TEST and STOP_TEST statements.
-##
-##  The first line starts the test. START_TEST reinitializes the caches and 
-##  the global random number generator, in order to be independent of the 
-##  reading order of several test files. Furthermore, the assertion level 
-##  is set to 2 by START_TEST and set back to the previous value in the 
-##  subsequent STOP_TEST call.
-##
-##  The argument of STOP_TEST may be an arbitrary identifier string.
-## 
-gap> START_TEST("Example package: testall.tst");
-
-# Note that you may use comments in the test file
-# and also separate parts of the test by empty lines
-
-# Check that the global variables are defined  
-gap> IsBound(DOCYCLICFIRST);
-true
-gap> IsBool(DOCYCLICFIRST);
-true
-gap> IsBound(DOCYCLICLAST);
-true
-gap> IsBool(DOCYCLICLAST);
-true
-gap> IsBound(LLLOFFSET);
-true
-gap> IsInt(LLLOFFSET);
-true
-gap> IsBound(DELTA);
-true
-gap> IsFloat(DELTA);
-true
+gap> START_TEST("indredtest.tst");
 
 #############################################################################
 # testing the main function
-gap> CharacterTableUnger(AlternatingGroup(6));
+gap> ct:=CharacterTableUnger(AlternatingGroup(6));
 CharacterTable( Alt( [ 1 .. 6 ] ) )
+gap> Display(ct);
+CT1
 
-gap> CharacterTableUnger(GeneralLinearGroup(2,3));
+     2  3  3  .  .  2  .  .
+     3  2  .  2  2  .  .  .
+     5  1  .  .  .  .  1  1
+
+       1a 2a 3a 3b 4a 5a 5b
+
+X.1     1  1  1  1  1  1  1
+X.2     5  1  2 -1 -1  .  .
+X.3     9  1  .  .  1 -1 -1
+X.4     8  . -1 -1  .  A *A
+X.5     8  . -1 -1  . *A  A
+X.6    10 -2  1  1  .  .  .
+X.7     5  1 -1  2 -1  .  .
+
+A = -E(5)^2-E(5)^3
+  = (1+Sqrt(5))/2 = 1+b5
+
+#
+gap> ct:=CharacterTableUnger(GeneralLinearGroup(2,3));
 CharacterTable( GL(2,3) )
+gap> Display(ct);
+CT2
 
-## Each test file should finish with the call of STOP_TEST.
-## The first argument of STOP_TEST should be the name of the test file.
-## The second argument is redundant and is used for backwards compatibility.
-gap> STOP_TEST( "testall.tst", 10000 );
+     2  4  1  4  1  3  3  3  2
+     3  1  1  1  1  .  .  .  .
 
-#############################################################################
-##
-#E
+       1a 6a 2a 3a 4a 8a 8b 2b
+
+X.1     1  1  1  1  1  1  1  1
+X.2     3  .  3  . -1 -1 -1  1
+X.3     3  .  3  . -1  1  1 -1
+X.4     2 -1  2 -1  2  .  .  .
+X.5     1  1  1  1  1 -1 -1 -1
+X.6     2  1 -2 -1  .  A -A  .
+X.7     4 -1 -4  1  .  .  .  .
+X.8     2  1 -2 -1  . -A  A  .
+
+A = -E(8)-E(8)^3
+  = -Sqrt(-2) = -i2
+
+#
+gap> STOP_TEST("indredtest.tst");
