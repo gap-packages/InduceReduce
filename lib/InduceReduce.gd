@@ -8,7 +8,7 @@
 #############################################################################
 ##
 #F CharacterTableUnger( <G> [, <Options>] )
-## 
+##
 ## Computes the character table of a finite group using Unger's algorithm
 ##
 DeclareGlobalFunction( "CharacterTableUnger" );
