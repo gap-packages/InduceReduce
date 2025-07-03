@@ -50,6 +50,7 @@ Persons := [
     LastName := "Horn",
     Email := "mhorn@rptu.de",
     WWWHome := "https://www.quendi.de/math",
+    GitHubUsername := "fingolfin",
     Place := "Kaiserslautern, Germany",
     Institution := "RPTU Kaiserslautern-Landau",
     PostalAddress := Concatenation(
