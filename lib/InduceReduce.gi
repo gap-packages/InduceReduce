@@ -112,16 +112,6 @@ InstallValue( IndRed , rec(
     local TR;
         TR:=rec();
 
-        ## compute q-part of an integer n
-        TR.pPart:= function(n,q)
-        local res;
-            res:=1;
-            while RemInt(n,res)=0 do
-                res:=res*q;
-            od;
-            return res/q;
-        end;
-
         # find the position of the conjugacy class containing g in GR.classes ,
         # ord is the order of g
         TR.FindClass:= function(GR,h,ord)
@@ -367,7 +357,7 @@ InstallValue( IndRed , rec(
             if GR.Elementary.isCyclic then
                 # some elementary groups contained in the cyclic group
                 for p in GR.CentralizerPrimes[i] do
-                    if TR.pPart(GR.n/GR.ccsizes[i],p)=TR.pPart(GR.orders[GR.IndexCyc],p) then
+                    if PValuation(GR.n/GR.ccsizes[i],p)=PValuation(GR.orders[GR.IndexCyc],p) then
                         RemoveSet(GR.CentralizerPrimes[i],p);
                         GR.NumberOfPrimes:=GR.NumberOfPrimes-1;
                     fi;
@@ -378,8 +368,8 @@ InstallValue( IndRed , rec(
             for i in Set(powermap) do
                 # elementary subgroups, where the cyclic part is generated
                 # by a power of GR.Elementary.z and the p-groups coincide
-                if TR.pPart(GR.n/GR.ccsizes[i],GR.Elementary.p) =
-                    TR.pPart(GR.n/GR.ccsizes[GR.IndexCyc],GR.Elementary.p) and
+                if PValuation(GR.n/GR.ccsizes[i],GR.Elementary.p) =
+                    PValuation(GR.n/GR.ccsizes[GR.IndexCyc],GR.Elementary.p) and
                     GR.Elementary.p in GR.CentralizerPrimes[i] then
                     RemoveSet(GR.CentralizerPrimes[i],GR.Elementary.p);
                     GR.NumberOfPrimes:=GR.NumberOfPrimes-1;
