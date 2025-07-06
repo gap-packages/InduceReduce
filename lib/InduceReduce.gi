@@ -62,8 +62,8 @@ InstallValue( IndRed , rec(
         GR.n:= Size(G);  # the order of G
         GR.classes:=ShallowCopy(ConjugacyClasses(GR.C)); # the conjugacy classes (mutable)
         GR.k:=Size(GR.classes); # number of conjugacy classes
-        GR.classreps:=List(GR.classes,x->Representative(x)); # class representatives
-        GR.orders:=List(GR.classreps, x->Order(x)); # element orders
+        GR.classreps:=List(GR.classes,Representative); # class representatives
+        GR.orders:=List(GR.classreps, Order); # element orders
             Info(InfoCTUnger, 1, "Induce/Restrict: group with ",
                  Length(GR.orders), " conjugacy classes.");
             Info(InfoCTUnger, 2, "Induce/Restrict: orders of class reps: ",
@@ -72,8 +72,8 @@ InstallValue( IndRed , rec(
             # sort by decreasing order of representatives
         GR.classes:=Permuted(GR.classes,GR.perm); # adjust the order of classes and classreps
         GR.classreps:=Permuted(GR.classreps,GR.perm);
-        GR.ccsizes:=List(GR.classes,x->Size(x)); # sizes of conjugacy classes
-        GR.OrderPrimes:=List(GR.orders,x->Set(Factors(x)));
+        GR.ccsizes:=List(GR.classes,Size); # sizes of conjugacy classes
+        GR.OrderPrimes:=List(GR.orders,PrimeDivisors);
             # primes dividing the orders of class representatives
         GR.CentralizerPrimes:=List([1..GR.k],
             x-> Filtered( Set(Factors(GR.n/GR.ccsizes[x])) , y-> not y in GR.OrderPrimes[x] )  );
@@ -81,7 +81,7 @@ InstallValue( IndRed , rec(
         GR.InduceCyclic:=ListWithIdenticalEntries(GR.k,true);
             # the characters of the corresponding cyclic groups still need to be induced
         GR.NumberOfCyclic:=GR.k; # number of cyclic groups whose characters need to be induced
-        GR.NumberOfPrimes:=Sum(GR.CentralizerPrimes,x->Size(x));
+        GR.NumberOfPrimes:=Sum(GR.CentralizerPrimes,Size);
             # number of primes for elementary subgroups not used so far
         GR.e:=Exponent(G); # exponent of G
         GR.ordersPos:=[];
@@ -316,9 +316,9 @@ InstallValue( IndRed , rec(
             GR.Elementary.ctblP:=CharacterTable(GR.Elementary.P);
                 # character table of p-group
             GR.Elementary.classrepsP:=List(ConjugacyClasses(GR.Elementary.ctblP),
-                x->Representative(x));
+                Representative);
                 #classes of p-group in corresponding order
-            GR.Elementary.ccsizesP:=List(ConjugacyClasses(GR.Elementary.ctblP),x->Size(x));                 # class sizes p-group
+            GR.Elementary.ccsizesP:=List(ConjugacyClasses(GR.Elementary.ctblP),Size);                 # class sizes p-group
             GR.Elementary.kP:=Size(GR.Elementary.classrepsP); # number of classes of p-group
             GR.Elementary.classrepsZ:=TR.ClassesCyclic(GR);
                 # class representatives cyclic group
