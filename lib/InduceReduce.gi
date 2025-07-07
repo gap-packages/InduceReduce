@@ -113,8 +113,10 @@ InstallValue( IndRed , rec(
 
         # find the position of the conjugacy class containing g in GR.classes ,
         # ord is the order of g
-        FindClass:= function(GR,h,ord)
+        FindClass:= function(GR,h,ord,skip...)
         local j;
+            Info(InfoCTUnger, 4, "  FindClass ord ", ord);
+            if Length(skip) > 0 then skip:=skip[1]; fi;
             for j in [GR.ordersPos[ord]..GR.k] do
                 if GR.orders[j] <> ord then
                     break;
@@ -125,16 +127,61 @@ InstallValue( IndRed , rec(
                 fi;
             od;
             for j in [GR.ordersPos[ord]..GR.k] do
+                if j in skip then continue; fi;
                 if h in GR.classes[j] then
                     return j;
                 fi;
             od;
         end,
 
+        PowMapPrime:= function(GR,l)
+        local p, res, r, h, i, e, f, skip;
+            p := GR.orders[l];
+            Assert(1, IsPrimeInt(p));
+            Info(InfoCTUnger, 3, "PowMapPrime ord ", p, ", class ", l);
+            res:=[IndRed.GroupTools.FindClass(GR,One(GR.G),1), l];
+            r:=PrimitiveRootMod(p);
+            h:=GR.classreps[l]^r;
+            e:=r;
+            i:=1;
+            skip:=[];
+            while h <> GR.classreps[l] do
+                Info(InfoCTUnger, 4, " PowMapPrime i ", i, ", e ", e);
+                res[e+1] := IndRed.GroupTools.FindClass(GR,h,p,skip);
+                Add(skip, res[e+1]);
+                Info(InfoCTUnger, 4, "  found class ", res[e+1]);
+                if res[e+1] = l then
+                    break;
+                fi;
+                e:=e*r mod p;
+                h:=h^r;
+                i:=i+1;
+            od;
+            # from now on the table is periodic, use this to fill in the rest
+            f:=1;
+            while h <> GR.classreps[l] do
+                res[e+1] := res[f+1];
+                Assert(2, res[e+1] = IndRed.GroupTools.FindClass(GR,h,p));
+                e:=e*r mod p;
+                f:=f*r mod p;
+                h:=h^r;
+                i:=i+1;
+            od;
+            return res;
+        end,
+
         ## compute powermap of l-th class representative and add it to GR
         PowMap:= function(GR,l)
         local h, res, i, ord;
-            if GR.orders[l]=1 then GR.powermaps[l]:=[l]; fi;
+            Info(InfoCTUnger, 3, "PowMap ord ", GR.orders[l], ", class ", l);
+            if GR.orders[l]=1 then
+              GR.powermaps[l]:=[l];
+              return;
+            fi;
+            if IsPrimeInt(GR.orders[l]) then
+              GR.powermaps[l]:=IndRed.GroupTools.PowMapPrime(GR,l);
+              return;
+            fi;
             res:=[IndRed.GroupTools.FindClass(GR,One(GR.G),1),l];
             h:=GR.classreps[l]^2;
             for i in [2..GR.orders[l]-1] do
