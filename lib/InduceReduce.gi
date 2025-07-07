@@ -64,10 +64,12 @@ InstallValue( IndRed , rec(
         GR.k:=Size(GR.classes); # number of conjugacy classes
         GR.classreps:=List(GR.classes,Representative); # class representatives
         GR.orders:=List(GR.classreps, Order); # element orders
-            Info(InfoCTUnger, 1, "Induce/Restrict: group with ",
-                 Length(GR.orders), " conjugacy classes.");
-            Info(InfoCTUnger, 2, "Induce/Restrict: orders of class reps: ",
-                 GR.orders);
+
+        Info(InfoCTUnger, 1, "Induce/Restrict: group with ",
+             Length(GR.orders), " conjugacy classes.");
+        Info(InfoCTUnger, 2, "Induce/Restrict: orders of class reps: ",
+             GR.orders);
+
         GR.perm:=Sortex(GR.orders,function(x,y) return y<x; end);
             # sort by decreasing order of representatives
         GR.classes:=Permuted(GR.classes,GR.perm); # adjust the order of classes and classreps
@@ -76,14 +78,13 @@ InstallValue( IndRed , rec(
         GR.OrderPrimes:=List(GR.orders,PrimeDivisors);
             # primes dividing the orders of class representatives
         GR.CentralizerPrimes:=List([1..GR.k],
-            x-> Filtered( Set(Factors(GR.n/GR.ccsizes[x])) , y-> not y in GR.OrderPrimes[x] )  );
+            x-> Difference( PrimeDivisors(GR.n/GR.ccsizes[x]), GR.OrderPrimes[x] ) );
             # primes dividing the order of the centralizer, but not the order of the element
         GR.InduceCyclic:=ListWithIdenticalEntries(GR.k,true);
             # the characters of the corresponding cyclic groups still need to be induced
         GR.NumberOfCyclic:=GR.k; # number of cyclic groups whose characters need to be induced
         GR.NumberOfPrimes:=Sum(GR.CentralizerPrimes,Size);
             # number of primes for elementary subgroups not used so far
-        GR.e:=Exponent(G); # exponent of G
         GR.ordersPos:=[];
             # create a non-dense list such that ordersPos[i] is the position of the first class of elements of order i
         for i in [1..GR.k] do
@@ -100,24 +101,24 @@ InstallValue( IndRed , rec(
         GR.centralizers:=[];  # centralizers and powermaps computed so far
         GR.powermaps:=[];
         return GR;
-    end ,
+    end,
 
 #############################################################################
 ##
-#F IndRed.GroupTools( )
+#F IndRed.GroupTools
 ##
-## returns a record with different functions used for the algorithm
+## a record with different functions used for the algorithm
 ##
-    GroupTools:=function()
-    local TR;
-        TR:=rec();
+    GroupTools:=rec(
 
         # find the position of the conjugacy class containing g in GR.classes ,
         # ord is the order of g
-        TR.FindClass:= function(GR,h,ord)
+        FindClass:= function(GR,h,ord)
         local j;
             for j in [GR.ordersPos[ord]..GR.k] do
-                if not GR.orders[j]=ord then break; fi;
+                if GR.orders[j] <> ord then
+                    break;
+                fi;
                 if h=GR.classreps[j] then
                 # first check if h actually equals one of the class representatives
                     return j;
@@ -128,113 +129,96 @@ InstallValue( IndRed , rec(
                     return j;
                 fi;
             od;
-        end;
+        end,
 
         ## compute powermap of l-th class representative and add it to GR
-        TR.PowMap:= function(GR,l)
+        PowMap:= function(GR,l)
         local h, res, i, ord;
             if GR.orders[l]=1 then GR.powermaps[l]:=[l]; fi;
-            res:=[TR.FindClass(GR,One(GR.G),1),l];
+            res:=[IndRed.GroupTools.FindClass(GR,One(GR.G),1),l];
             h:=GR.classreps[l]^2;
             for i in [2..GR.orders[l]-1] do
                 ord:=GR.orders[l]/GcdInt(GR.orders[l],i);
 
-                Add(res , TR.FindClass(GR,h,ord));
+                Add(res, IndRed.GroupTools.FindClass(GR,h,ord));
 
                 h:=h*GR.classreps[l];
             od;
             GR.powermaps[l]:=res;
-        end;
-
-        ## Compute fusion of conjugacy classes of GR.Elementary to classes of G
-        TR.ClassFusion:= function(GR)
-        local i, j, res, ord, found;
-            res:=[];
-            for i in [1..GR.Elementary.k] do
-                ord:=Order(GR.Elementary.classreps[i]);
-                Add(res, TR.FindClass(GR,GR.Elementary.classreps[i],ord));
-            od;
-            return res;
-        end;
+        end,
 
         ## Compute character table of cyclic group as matrix
-        TR.Vandermonde:= function(GR)
-        local i, j, M;
-            M:=NullMat(GR.orders[GR.IndexCyc],GR.orders[GR.IndexCyc]);
-            for i in [0..GR.orders[GR.IndexCyc]-1] do
-                for j in [0..GR.orders[GR.IndexCyc]-1] do
-                    M[i+1][j+1]:=E(GR.orders[GR.IndexCyc])^(i*j);
+        Vandermonde:= function(GR)
+        local n, i, j, M;
+            n:=GR.orders[GR.IndexCyc];
+            M:=NullMat(n,n);
+            for i in [0..n-1] do
+                for j in [0..n-1] do
+                    M[i+1,j+1]:=E(n)^(i*j);
                 od;
             od;
             return M;
-        end;
+        end,
 
         # conjugacy class representatives of cyclic group corresponding to
         # the ordering of columns in Vandermonde
-        TR.ClassesCyclic:=function(GR)
+        ClassesCyclic:=function(GR)
         local res, h;
             res:=[Identity(GR.G)];
             h:=GR.Elementary.z;
-            while not h=Identity(GR.G) do
+            while not IsOne(h) do
                 Add(res,h);
                 h:=h*GR.Elementary.z;
             od;
             return res;
-        end;
-
-        return TR;
-
-    end ,
+        end,
+    ),
 
 #############################################################################
 ##
-#F IndRed.ReduceTools( )
+#F IndRed.ReduceTools
 ##
-## returns a record with different functions required for lattice reduction
+## a record with different functions required for lattice reduction
 ##
-    ReduceTools:=function()
-    local RedTR,ip, ipSparse;
-
-        RedTR:=rec();
+    ReduceTools:=rec(
 
         # inner product of class functions x and y
         ip:= function(GR,x,y)
             return Sum([1..GR.k], i->x[i]*ComplexConjugate(y[i])*GR.ccsizes[i])/GR.n;
-        end;
+        end,
 
         # inner product of class functions x and y with few entries
         # one of them has all non-zero entries in GR.Elementary.FusedClasses
         ipSparse:= function(GR,x,y)
             return Sum(GR.Elementary.FusedClasses,
                 i->x[i]*ComplexConjugate(y[i])*GR.ccsizes[i])/GR.n;
-        end;
+        end,
 
         # reduce new induced characters by the irreducibles found so far
-        RedTR.redsparse:=function(GR)
+        redsparse:=function(GR)
         local mat,pos;
             if GR.m+1>Size(GR.B) then return; fi;
             pos:=[GR.m+1..Size(GR.B)];
-            mat:=List( pos , x->List(GR.Ir, y -> ipSparse(GR,GR.B[x],y) ) );
+            mat:=List( pos, x->List(GR.Ir, y -> IndRed.ReduceTools.ipSparse(GR,GR.B[x],y) ) );
             GR.B{pos}:=GR.B{pos}-mat*GR.Ir;
-        end;
+        end,
 
         # extend the gram matrix with the scalar products of the new characters
-        RedTR.GramMatrixGR:=function(GR)
+        GramMatrixGR:=function(GR)
         local i,j,mat,b;
             b:=Size(GR.B);
             mat:=NullMat(b,b);
             mat{[1..GR.m]}{[1..GR.m]}:=GR.Gram;
             for i in [GR.m+1..b] do
                 for j in [1..i] do
-                    mat[i][j]:=ip(GR,GR.B[i],GR.B[j]);
-                    mat[j][i]:=mat[i][j];
+                    mat[i,j]:=IndRed.ReduceTools.ip(GR,GR.B[i],GR.B[j]);
+                    mat[j,i]:=mat[i,j];
                 od;
             od;
             GR.Gram:=mat;
-        end;
+        end,
 
-        return RedTR;
-    end ,
+    ),
 
 #############################################################################
 ##
@@ -255,7 +239,7 @@ InstallValue( IndRed , rec(
                 Elementary.z:=GR.classreps[GR.IndexCyc];
                 Elementary.p:=Random(GR.CentralizerPrimes[GR.IndexCyc]);
                     # choose a random prime for that conjugacy class
-                RemoveSet(GR.CentralizerPrimes[GR.IndexCyc] , Elementary.p);
+                RemoveSet(GR.CentralizerPrimes[GR.IndexCyc], Elementary.p);
                 GR.NumberOfPrimes:=GR.NumberOfPrimes-1;
                 if not IsBound(GR.centralizers[GR.IndexCyc]) then
                     # compute the centralizer, if not done already
@@ -288,7 +272,7 @@ InstallValue( IndRed , rec(
 ## subgroups and their conjugates from the computations yet to come.
 ##
     InitElementary:=function(GR,TR)
-        local i,j,i1,j1,p,temp,powermap;
+        local i,j,i1,j1,p,temp,powermap,pm;
         if GR.Elementary.isCyclic then
             GR.Elementary.n:=GR.orders[GR.IndexCyc]; # order of the elementary group
             GR.Elementary.k:=GR.Elementary.n; # number of conjugacy classes
@@ -323,12 +307,12 @@ InstallValue( IndRed , rec(
             GR.Elementary.ccsizes:=[]; # and the class sizes
             for i in [1..GR.Elementary.kP] do
                 for j in [1..GR.Elementary.kZ] do
-                    Add(GR.Elementary.classreps ,
+                    Add(GR.Elementary.classreps,
                         GR.Elementary.classrepsP[i]*GR.Elementary.classrepsZ[j]);
                     Add(GR.Elementary.ccsizes,GR.Elementary.ccsizesP[i]);
                 od;
             od;
-            GR.Elementary.classfusion:=TR.ClassFusion(GR);
+            GR.Elementary.classfusion:=List(GR.Elementary.classreps, r -> TR.FindClass(GR, r, Order(r)));
                 # compute the fusion of conjugacy classes of the elementary group
                 # to conjugacy classes of G
             GR.Elementary.XP:=Irr(GR.Elementary.ctblP);
@@ -365,24 +349,24 @@ InstallValue( IndRed , rec(
             fi;
         od;
         if not GR.Elementary.isCyclic then
+            p:=GR.Elementary.p;
             for i in Set(powermap) do
                 # elementary subgroups, where the cyclic part is generated
                 # by a power of GR.Elementary.z and the p-groups coincide
-                if PValuation(GR.n/GR.ccsizes[i],GR.Elementary.p) =
-                    PValuation(GR.n/GR.ccsizes[GR.IndexCyc],GR.Elementary.p) and
-                    GR.Elementary.p in GR.CentralizerPrimes[i] then
-                    RemoveSet(GR.CentralizerPrimes[i],GR.Elementary.p);
+                if PValuation(GR.n/GR.ccsizes[i],p)=PValuation(GR.n/GR.ccsizes[GR.IndexCyc],p) and
+                        p in GR.CentralizerPrimes[i] then
+                    RemoveSet(GR.CentralizerPrimes[i],p);
                     GR.NumberOfPrimes:=GR.NumberOfPrimes-1;
                 fi;
             od;
         fi;
         for i in [0..GR.orders[GR.IndexCyc]-1] do
             # derive the powermaps of powers of GR.Elementary.z
-            if not IsBound(GR.powermaps[powermap[i+1]]) then
-                GR.powermaps[powermap[i+1]]:=[];
-                for j in [0..GR.orders[powermap[i+1]]-1] do
-                    Add(GR.powermaps[powermap[i+1]],
-                        powermap[ i*j mod GR.orders[GR.IndexCyc] +1 ]);
+            pm:=powermap[i+1];
+            if not IsBound(GR.powermaps[pm]) then
+                GR.powermaps[pm]:=[];
+                for j in [0..GR.orders[pm]-1] do
+                    Add(GR.powermaps[pm], powermap[ i*j mod GR.orders[GR.IndexCyc] +1 ]);
                 od;
             fi;
         od;
@@ -414,12 +398,12 @@ InstallValue( IndRed , rec(
 ## GR.Elementary to the group GR.G and add them to GR.B
 ##
     Induce:=function(GR)
-    local mat, i, j;
+    local mat, i, j, cfj;
         mat:=NullMat(GR.Elementary.k,GR.k);
         for i in [1..GR.Elementary.k] do
             for j in [1..GR.Elementary.k] do
-                mat[i][GR.Elementary.classfusion[j]]:=mat[i][GR.Elementary.classfusion[j]]+
-                    ( (GR.n/GR.ccsizes[GR.Elementary.classfusion[j]]) /
+                cfj := GR.Elementary.classfusion[j];
+                mat[i,cfj]:=mat[i,cfj] + ( (GR.n/GR.ccsizes[cfj]) /
                     (GR.Elementary.n/GR.Elementary.ccsizes[j])*GR.Elementary.XE[i][j] );
             od;
         od;
@@ -449,7 +433,7 @@ InstallValue( IndRed , rec(
             ind:=[];
             GR.m:=Size(GR.Gram);
             for i in [1..GR.m] do
-                if GR.Gram[i][i]=1 then
+                if GR.Gram[i,i]=1 then
                     Add(temp,i); # find positions of characters of norm 1
                 else
                     Add(ind,i);
@@ -466,7 +450,7 @@ InstallValue( IndRed , rec(
                 Append(GR.Ir,I);
                 GR.Gram:=[];
                 Info(InfoCTUnger, 2, "Reduce: |Irr| = ", Length(GR.Ir));
-            return ;
+                return;
             fi;
             for i in Reversed(temp) do
                 Remove(GR.B,i); # remove irreducible characters from B
@@ -520,8 +504,8 @@ InstallGlobalFunction( InduceReduce,
 function(GR,Opt)
 local TR, RedTR, H, ccsizesH, temp, it;
 
-    TR:=IndRed.GroupTools(); # get group tools and reduce tools
-    RedTR:=IndRed.ReduceTools();
+    TR:=IndRed.GroupTools; # get group tools and reduce tools
+    RedTR:=IndRed.ReduceTools;
 
     if Opt.DoCyclicFirst = true then # if option Opt.DoCyclicFirst is set,
         # induce from all cyclic groups first and reduce
