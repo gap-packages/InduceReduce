@@ -174,6 +174,7 @@ InstallValue( IndRed , rec(
         PowMap:= function(GR,l)
         local h, res, i, ord;
             Info(InfoCTUnger, 3, "PowMap ord ", GR.orders[l], ", class ", l);
+Error("todo");
             if GR.orders[l]=1 then
               GR.powermaps[l]:=[l];
               return;
