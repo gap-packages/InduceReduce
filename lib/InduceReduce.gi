@@ -556,40 +556,93 @@ local TR, RedTR, H, ccsizesH, temp, it;
 
 end );
 
+
 #############################################################################
 ##
-#F CharacterTableUnger( <G> )
+#M  UngerRecord( <G> )
 ##
-## Computes the character table of a finite group using Unger's algorithm
+##  Compute a record that contains data used by Unger's algorithm.
 ##
-InstallGlobalFunction( CharacterTableUnger,
-function(G, Options...)
-local GR, Opt, T;
+InstallMethod( UngerRecord,
+    [ "IsGroup" ],
+    IndRed.Init );
 
-    GR:=IndRed.Init(G);
 
-    Opt:=ShallowCopy(CTUngerDefaultOptions);
-    if Length(Options)>0 and IsRecord(Options[1]) then
-        if IsBound(Options[1].DoCyclicFirst) and IsBool(Options[1].DoCyclicFirst) then
-            Opt.DoCyclicFirst:=Options[1].DoCyclicFirst;
-        fi;
-        if IsBound(Options[1].DoCyclicLast) and IsBool(Options[1].DoCyclicLast) then
-            Opt.DoCyclicLast:=Options[1].DoCyclicLast;
-        fi;
-        if IsBound(Options[1].LLLOffset) and IsInt(Options[1].LLLOffset) then
-            Opt.LLLOffset:=Options[1].LLLOffset;
-        fi;
-        if IsBound(Options[1].Delta) and IsRat(Options[1].Delta)
-            and 1/4<Options[1].Delta and Options[1].Delta<=1 then
-            Opt.Delta:=Options[1].Delta;
-        fi;
+#############################################################################
+##
+#M  IrrUnger( <G>[, <options>] )  . . . . . . . . . .  call Unger's algorithm
+##
+##  Compute the irreducible characters of <G>, using Unger's algorithm.
+##
+InstallMethod( IrrUnger,
+    [ "IsGroup" ],
+    G -> IrrUnger( G, rec() ) );
+
+InstallMethod( IrrUnger,
+    [ "IsGroup", "IsRecord" ],
+    function( G, Options )
+    local t, GR, Opt;
+
+    GR:= UngerRecord( G );
+    t:= GR.C;
+
+    Opt:= ShallowCopy( CTUngerDefaultOptions );
+    if IsBound( Options.DoCyclicFirst ) and IsBool( Options.DoCyclicFirst ) then
+      Opt.DoCyclicFirst:= Options.DoCyclicFirst;
+    fi;
+    if IsBound( Options.DoCyclicLast ) and IsBool( Options.DoCyclicLast ) then
+      Opt.DoCyclicLast:= Options.DoCyclicLast;
+    fi;
+    if IsBound( Options.LLLOffset ) and IsInt( Options.LLLOffset ) then
+      Opt.LLLOffset:= Options.LLLOffset;
+    fi;
+    if IsBound( Options.Delta ) and IsRat( Options.Delta )
+       and 1/4 < Options.Delta and Options.Delta <= 1 then
+      Opt.Delta:= Options.Delta;
     fi;
 
-    InduceReduce(GR,Opt); # do the induce-reduce algorithm
+    InduceReduce( GR, Opt ); # do the induce-reduce algorithm
 
-    IndRed.tinI(GR);
+    IndRed.tinI( GR ); # adjusts the sorting of vectors in `GR.Ir`
+    return List( GR.Ir, x -> Character( t, x ) );
+    end );
 
-    # convert the result into a chacacter table
+#############################################################################
+##
+#M  Irr( <G>, 0 ) . . . . . . . . . . . . . . . . . .  call Unger's algorithm
+##
+InstallMethod( Irr,
+  "for a group and zero, use Unger's algorithm",
+  [ IsGroup, IsZeroCyc ],
+  function( G, zero )
+  local t, irr;
+
+  t:= OrdinaryCharacterTable( G );
+  irr:= IrrUnger( G );
+  SetIrr( t, irr );
+  SetInfoText( t, "origin: Unger's algorithm" );
+  return irr;
+  end );
+
+
+#############################################################################
+##
+#F CharacterTableUnger( <G>[, <Options>] )
+##
+##  Return a character table of <G> whose irreducible characters are computed
+##  using Unger's algorithm.
+##
+InstallGlobalFunction( CharacterTableUnger, function(G, Options...)
+    local GR, T;
+
+    if Length( Options ) = 0 then
+      IrrUnger( G );
+    else
+      IrrUnger( G, Options[1] );
+    fi;
+    GR:= UngerRecord( G );
+
+    # Create a character table independent of the one stored in `G`.
     T:=rec();
     T.UnderlyingCharacteristic:=0;
     T.NrConjugacyClasses:=GR.k;
@@ -601,6 +654,5 @@ local GR, Opt, T;
     T.UnderlyingGroup:=UnderlyingGroup(GR.C);
     T.IdentificationOfConjugacyClasses:=IdentificationOfConjugacyClasses(GR.C);
     T.InfoText:="Computed using Unger's induce-reduce algorithm";
-    ConvertToCharacterTableNC(T);
-    return T;
+    return ConvertToCharacterTableNC( T) ;
 end );
