@@ -5,6 +5,21 @@
 #
 # Copyright (C) 2018     Jonathan Gruber
 #
+
+#############################################################################
+##
+#A  UngerRecord( <G> )
+##
+DeclareAttribute( "UngerRecord", IsGroup, "mutable" );
+
+#############################################################################
+##
+#A  IrrUnger( <G> )
+#O  IrrUnger( <G>[, <Options>] )
+##
+DeclareAttribute( "IrrUnger", IsGroup );
+DeclareOperation( "IrrUnger", [ IsGroup, IsRecord ] );
+
 #############################################################################
 ##
 #F CharacterTableUnger( <G> [, <Options>] )
