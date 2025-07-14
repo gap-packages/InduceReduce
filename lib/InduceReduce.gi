@@ -654,5 +654,5 @@ InstallGlobalFunction( CharacterTableUnger, function(G, Options...)
     T.UnderlyingGroup:=UnderlyingGroup(GR.C);
     T.IdentificationOfConjugacyClasses:=IdentificationOfConjugacyClasses(GR.C);
     T.InfoText:="Computed using Unger's induce-reduce algorithm";
-    return ConvertToCharacterTableNC( T) ;
+    return ConvertToCharacterTableNC( T );
 end );
