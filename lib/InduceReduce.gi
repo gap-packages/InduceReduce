@@ -174,7 +174,7 @@ InstallValue( IndRed , rec(
         PowMap:= function(GR,l)
         local h, res, i, ord;
             Info(InfoCTUnger, 3, "PowMap ord ", GR.orders[l], ", class ", l);
-Error("todo");
+#Error("todo");
             if GR.orders[l]=1 then
               GR.powermaps[l]:=[l];
               return;
@@ -396,6 +396,8 @@ Error("todo");
             if GR.Elementary.isCyclic then
                 # some elementary groups contained in the cyclic group
                 for p in GR.CentralizerPrimes[i] do
+                    #Assert(0, GR.n/GR.ccsizes[i] = GR.orders[i]);
+                    #Assert(0, GR.n/GR.ccsizes[GR.IndexCyc] = GR.orders[GR.IndexCyc]);
                     if PValuation(GR.n/GR.ccsizes[i],p)=PValuation(GR.orders[GR.IndexCyc],p) then
                         RemoveSet(GR.CentralizerPrimes[i],p);
                         GR.NumberOfPrimes:=GR.NumberOfPrimes-1;
