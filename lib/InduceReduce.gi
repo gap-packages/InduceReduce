@@ -184,7 +184,14 @@ InstallValue( IndRed , rec(
 
         # inner product of class functions x and y
         ip:= function(GR,x,y)
-            return Sum([1..GR.k], i->x[i]*ComplexConjugate(y[i])*GR.ccsizes[i])/GR.n;
+            local res, i;
+            res := 0;
+            for i in [1..GR.k] do
+              if x[i] <> 0 and y[i] <> 0 then
+                res := res + x[i]*ComplexConjugate(y[i])*GR.ccsizes[i];
+              fi;
+            od;
+            return res/GR.n;
         end,
 
         # inner product of class functions x and y with few entries
