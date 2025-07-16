@@ -73,7 +73,9 @@ PackageWWWHome :="https://gap-packages.github.io/InduceReduce/",
 
 PackageInfoURL := Concatenation( ~.PackageWWWHome, "PackageInfo.g" ),
 README_URL     := Concatenation( ~.PackageWWWHome, "README.md" ),
-ArchiveURL     := Concatenation( ~.PackageWWWHome, "InduceReduce-", ~.Version ),
+ArchiveURL     := Concatenation( ~.SourceRepository.URL,
+                                 "/releases/download/v", ~.Version,
+                                 "/", ~.PackageName, "-", ~.Version ),
 
 ArchiveFormats := ".tar.gz",
 
