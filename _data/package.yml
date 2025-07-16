@@ -1,64 +1,69 @@
 name: InduceReduce
-version: 1.0
-date: 2018-09-04
+version: "1.1"
+license: "GPL-3.0-or-later"
+date: 2025-07-16
 description: |
-    Unger's algorithm to compute charater tables of finite groups
+    Unger's algorithm to compute character tables of finite groups
 
 authors:
     - name: Jonathan Gruber
-      url: mailto:gruber@mathemaik.uni-kl.de
+      url: mailto:jonathan.gruber@fau.de
 
 maintainers:
     - name: Jonathan Gruber
-      url: mailto:gruber@mathemaik.uni-kl.de
+      url: mailto:jonathan.gruber@fau.de
+    - name: Thomas Breuer
+      url: https://www.math.rwth-aachen.de/~Thomas.Breuer
+    - name: Max Horn
+      url: https://www.quendi.de/math
 
-GAP: ">= 4.0"
+GAP: ">= 4.9"
 
 needed-pkgs:
     - name: "GAPDoc"
       version: ">= 1.5"
-      url: "http://www.math.rwth-aachen.de/~Frank.Luebeck/GAPDoc"
+      url: "https://www.math.rwth-aachen.de/~Frank.Luebeck/GAPDoc"
 
-www: https://jonathan-144.github.io/InduceReduce
+www: https://gap-packages.github.io/InduceReduce/
 readme: README.md
-packageinfo: https://jonathan-144.github.io/InduceReduce/PackageInfo.g
+packageinfo: https://gap-packages.github.io/InduceReduce/PackageInfo.g
 
 downloads:
     - name: .tar.gz
-      url: https://jonathan-144.github.io/InduceReduce/InduceReduce-1.0.tar.gz
+      url: https://github.com/gap-packages/InduceReduce/releases/download/v1.1/InduceReduce-1.1.tar.gz
 
 abstract: |
     This package provides an implementation of Unger's algorithm to compute the character table of a finite group.
 
-status: dev
-doc-html: doc/chap0.html
+status: deposited
+doc-html: doc/chap0_mj.html
 doc-pdf: doc/manual.pdf
 keywords: |
     character table, elementary subgroups, induced characters.
 citeas: |
     <p class='BibEntry'>
-    [<span class='BibKey'>Gru18</span>]   <b class='BibAuthor'>Gruber, J.</b>,
-     <i class='BibTitle'>InduceReduce, Unger's algorithm to compute charater tables of finite groups,
-             Version 1.0</i>
-     (<span class='BibYear'>2018</span>)<br />
+    [<span class='BibKey'>GBH25</span>]   <b class='BibAuthor'>Gruber, J., Breuer, T. and Horn, M.</b>,
+     <i class='BibTitle'>InduceReduce, Unger's algorithm to compute character tables of finite groups,
+             Version 1.1</i>
+     (<span class='BibYear'>2025</span>)<br />
     (<span class='BibNote'>GAP package</span>),
-    <span class='BibHowpublished'><a href="https://jonathan-144.github.io/InduceReduce">https://jonathan-144.github.io/InduceReduce</a></span>.
+    <span class='BibHowpublished'><a href="https://gap-packages.github.io/InduceReduce/">https://gap-packages.github.io/InduceReduce/</a></span>.
     </p>
     
 
 bibtex: |
-    @misc{ InduceReduce1.0,
-      author =           {Gruber, J.},
-      title =            {{InduceReduce},  Unger's algorithm to compute charater
-                          tables of finite groups, {V}ersion 1.0},
-      month =            {Sep},
-      year =             {2018},
+    @misc{ InduceReduce,
+      author =           {Gruber, J. and Breuer, T. and Horn, M.},
+      title =            {{InduceReduce},    {Unger's   algorithm   to   compute
+                          character tables of finite groups}, {V}ersion 1.1},
+      month =            {Jul},
+      year =             {2025},
       note =             {GAP package},
-      howpublished =     {\href    {https://jonathan-144.github.io/InduceReduce}
-                          {\texttt{https://jonathan-144.github.io/}\discretionary
-                          {}{}{}\texttt{InduceReduce}}},
+      howpublished =     {\href   {https://gap-packages.github.io/InduceReduce/}
+                          {\texttt{https://gap\texttt{\symbol{45}}packages.github.io/}\discretionary
+                          {}{}{}\texttt{InduceReduce/}}},
       keywords =         {character   table;   elementary   subgroups;   induced
                           characters},
-      printedkey =       {Gru18}
+      printedkey =       {GBH25}
     }
 
