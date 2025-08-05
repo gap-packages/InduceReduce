@@ -31,7 +31,8 @@
 ## a rational that specifies the parameter delta for the LLL reduction
 ##
 CTUngerDefaultOptions := rec(
-    DoCyclicFirst := false,
+    #DoCyclicFirst := false,
+    DoCyclicFirst := true,
     DoCyclicLast := false,
     LLLOffset := 0,
     Delta := 3/4
@@ -78,8 +79,11 @@ InstallValue( IndRed , rec(
         GR.OrderPrimes:=List(GR.orders,PrimeDivisors);
             # primes dividing the orders of class representatives
         GR.CentralizerPrimes:=List([1..GR.k],
-            x-> Difference( PrimeDivisors(GR.n/GR.ccsizes[x]), GR.OrderPrimes[x] ) );
-            # primes dividing the order of the centralizer, but not the order of the element
+            x-> Filtered(Difference( PrimeDivisors(GR.n/GR.ccsizes[x]), 
+                GR.OrderPrimes[x] ), p-> GR.n/GR.ccsizes[x] mod p^2 = 0) );
+            # primes p with p^2 dividing the order of the centralizer, 
+            # but not the order of the element (if p divides only once,
+            # the corresponding elementary subgroup is certainly cyclic)
         GR.InduceCyclic:=ListWithIdenticalEntries(GR.k,true);
             # the characters of the corresponding cyclic groups still need to be induced
         GR.NumberOfCyclic:=GR.k; # number of cyclic groups whose characters need to be induced
@@ -99,7 +103,11 @@ InstallValue( IndRed , rec(
         # position of the cyclic group curretly used in the list of class representatives
         GR.m:=0; # positions from which on characters are not reduced so far
         GR.centralizers:=[];  # centralizers and powermaps computed so far
-        GR.powermaps:=[];
+        #GR.powermaps:=[];
+        # fill in all powermaps of classes
+        IndRed.GroupTools.PowMap(GR, 1);
+        # classes of inverse elements (saves ComplexConjugate calls)
+        GR.invmap := List(GR.powermaps, a-> a[Length(a)]);
         return GR;
     end,
 
@@ -113,7 +121,7 @@ InstallValue( IndRed , rec(
 
         # find the position of the conjugacy class containing g in GR.classes ,
         # ord is the order of g
-        FindClass:= function(GR,h,ord)
+        FindClassOld:= function(GR,h,ord)
         local j;
             for j in [GR.ordersPos[ord]..GR.k] do
                 if GR.orders[j] <> ord then
@@ -130,9 +138,12 @@ InstallValue( IndRed , rec(
                 fi;
             od;
         end,
+        FindClass:= function(GR,h,ord)
+          return PositionConjugacyClass(GR.G,h)^GR.perm;
+        end,
 
         ## compute powermap of l-th class representative and add it to GR
-        PowMap:= function(GR,l)
+        PowMapOld:= function(GR,l)
         local h, res, i, ord;
             if GR.orders[l]=1 then GR.powermaps[l]:=[l]; fi;
             res:=[IndRed.GroupTools.FindClass(GR,One(GR.G),1),l];
@@ -145,6 +156,11 @@ InstallValue( IndRed , rec(
                 h:=h*GR.classreps[l];
             od;
             GR.powermaps[l]:=res;
+        end,
+        PowMap:= function(GR, l)
+          # we do all at once
+          GR.powermaps := Permuted(PowerMapsOfAllClasses(GR.G), GR.perm);
+          GR.powermaps := List(GR.powermaps, a-> OnTuples(a, GR.perm));
         end,
 
         ## Compute character table of cyclic group as matrix
@@ -184,11 +200,13 @@ InstallValue( IndRed , rec(
 
         # inner product of class functions x and y
         ip:= function(GR,x,y)
-            local res, i;
+            local res, cc, i;
+            cc := GR.invmap;
             res := 0;
             for i in [1..GR.k] do
               if x[i] <> 0 and y[i] <> 0 then
-                res := res + x[i]*ComplexConjugate(y[i])*GR.ccsizes[i];
+                #res := res + x[i]*ComplexConjugate(y[i])*GR.ccsizes[i];
+                res := res + x[i]*y[cc[i]]*GR.ccsizes[i];
               fi;
             od;
             return res/GR.n;
@@ -197,16 +215,24 @@ InstallValue( IndRed , rec(
         # inner product of class functions x and y with few entries
         # one of them has all non-zero entries in GR.Elementary.FusedClasses
         ipSparse:= function(GR,x,y)
+            local cc;
+            cc := GR.invmap;
             return Sum(GR.Elementary.FusedClasses,
-                i->x[i]*ComplexConjugate(y[i])*GR.ccsizes[i])/GR.n;
+                #i->x[i]*ComplexConjugate(y[i])*GR.ccsizes[i])/GR.n;
+                i->x[i]*y[cc[i]]*GR.ccsizes[i])/GR.n;
         end,
-
+        
         # reduce new induced characters by the irreducibles found so far
         redsparse:=function(GR)
-        local mat,pos;
+        local ip, mat,pos;
+            if IsBound(GR.imported) then
+              ip := IndRed.ReduceTools.ip;
+            else
+              ip := IndRed.ReduceTools.ipSparse;
+            fi;
             if GR.m+1>Size(GR.B) then return; fi;
             pos:=[GR.m+1..Size(GR.B)];
-            mat:=List( pos, x->List(GR.Ir, y -> IndRed.ReduceTools.ipSparse(GR,GR.B[x],y) ) );
+            mat:=List( pos, x->List(GR.Ir, y -> ip(GR,GR.B[x],y) ) );
             GR.B{pos}:=GR.B{pos}-mat*GR.Ir;
         end,
 
@@ -253,8 +279,13 @@ InstallValue( IndRed , rec(
                     GR.centralizers[GR.IndexCyc]:=Centralizer(GR.G,Elementary.z);
                 fi;
                 Elementary.P:=SylowSubgroup(GR.centralizers[GR.IndexCyc],Elementary.p);
-                GR.Elementary:=Elementary;
-                break;
+                if not IsCyclic(Elementary.P) then
+                  GR.Elementary:=Elementary;
+                  break;
+                else
+                  # E is cyclic
+                  Elementary := rec();
+                fi;
             elif GR.InduceCyclic[GR.IndexCyc] and
                 (not Opt.DoCyclicLast or GR.NumberOfPrimes<=0) then
                 # if there are no primes left for this class, induce from cyclic group
@@ -380,13 +411,23 @@ InstallValue( IndRed , rec(
         return;
     end ,
 
+
+#############################################################################
+##
+#F IndRed.ImportGeneralizedCharacters( <GR>, chars )
+##
+## import generalized characters coming from somewhere else
+##
+    ImportGeneralizedCharacters:=function(GR, chars)
+        Append(GR.B, List(chars, ch-> Permuted(ch, GR.perm)));
+    end ,
 #############################################################################
 ##
 #F IndRed.InduceCyc( <GR> )
 ##
 ## induce characters from all cyclic subgroups
 ##
-    InduceCyc:=function(GR)
+    InduceCycOld:=function(GR)
     local ords, inds;
         GR.Elementary:=rec();
         ords := ShallowCopy(OrdersClassRepresentatives(GR.C));
@@ -396,6 +437,14 @@ InstallValue( IndRed , rec(
         Append(GR.B, List(InducedCyclic(GR.C,inds,"all"), ch-> Permuted(ch, GR.perm)));
         return;
     end ,
+    # only need maximal cyclic subgroups
+    InduceCyc:=function(GR)
+      local chars;
+      GR.Elementary:=rec();
+      GR.Elementary.FusedClasses := [1..GR.k];
+      chars := InducedFromAllMaximalCyclicSubgroups(GR.G);
+      IndRed.ImportGeneralizedCharacters(GR, chars);
+    end,
 
 #############################################################################
 ##
@@ -428,6 +477,7 @@ InstallValue( IndRed , rec(
 #
     Reduce:=function(GR,RedTR,Opt)
     local mat,temp,ind,I,i;
+        # handle case of imported characters
         RedTR.redsparse(GR); #reduce new characters by all irreducibles
         RedTR.GramMatrixGR(GR); # update the gram matrix
         if Opt.LLLOffset>0 then
@@ -447,9 +497,11 @@ InstallValue( IndRed , rec(
                 fi;
             od;
             if Size(temp)=0 then
+                GR.foundDim := Length(GR.Ir)+Length(GR.Gram);
+                GR.foundDet := DeterminantMat(GR.Gram);
                 Info(InfoCTUnger, 2, "Reduce: |Irr| = ", Length(GR.Ir),
-                    ", dim = ", Length(GR.Ir)+Length(GR.Gram),
-                    ", det(G) = ", DeterminantMat(GR.Gram));
+                    ", dim = ", GR.foundDim,
+                    ", det(G) = ", GR.foundDet);
                 return;
             fi;
             I:=GR.B{temp}; # irreducible characters in B (up to sign)
@@ -467,9 +519,11 @@ InstallValue( IndRed , rec(
             GR.m:=Size(ind);
             GR.B:=GR.B-mat*I;
             Append(GR.Ir,Set(I)); # add the new irreducible characters to I
+            GR.foundDim := Length(GR.Ir)+Length(GR.Gram);
+            GR.foundDet := DeterminantMat(GR.Gram);
             Info(InfoCTUnger, 2, "Reduce: |Irr| = ", Length(GR.Ir),
-                ", dim = ", Length(GR.Ir)+Length(GR.Gram),
-                ", det(G) = ", DeterminantMat(GR.Gram));
+                    ", dim = ", GR.foundDim,
+                    ", det(G) = ", GR.foundDet);
         fi;
         return;
     end ,
@@ -524,6 +578,18 @@ local TR, RedTR, H, ccsizesH, temp, it;
         GR.InduceCyclic:=ListWithIdenticalEntries(GR.k,false);
         GR.NumberOfCyclic:=0;
     fi;
+
+    if Size(GR.Ir)>=GR.k then
+        return GR.Ir;
+    fi;
+
+    # start with some generalized characters which are easy to compute
+    Info(InfoCTUnger, 2, "Induce: natural and power map characters");
+    IndRed.ImportGeneralizedCharacters(GR, NaturalCharacters(GR.G));
+    IndRed.ImportGeneralizedCharacters(GR, SmallPowerMapCharacters(GR.G));
+    GR.imported := true;
+    IndRed.Reduce(GR, RedTR, Opt);
+    Unbind(GR.imported);
 
     if Size(GR.Ir)>=GR.k then
         return GR.Ir;
