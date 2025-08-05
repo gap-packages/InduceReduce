@@ -5,3 +5,6 @@
 #
 
 ReadPackage( "InduceReduce", "lib/InduceReduce.gd");
+ReadPackage( "InduceReduce", "lib/PositionConjugacyClass.gd");
+ReadPackage( "InduceReduce", "lib/PowerMaps.gd");
+ReadPackage( "InduceReduce", "lib/SomeCharacters.gd");
