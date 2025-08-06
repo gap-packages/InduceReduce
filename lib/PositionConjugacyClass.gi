@@ -94,6 +94,18 @@ CCInvFuncs.ConjTest := function(r, tree)
   Add(tree, tree[3]);
 end;
 
+# use element order
+# (note that for permutations/matrices computing the order
+# needs the cycle structure/minimal polynomial, so that this 
+# is only used in the fallback variant)
+CCInvFuncs.Order := function(r, tree)
+  local fu;
+  fu := function(r, x)
+    return Order(x);
+  end;
+  CCInvFuncs.refine(r, tree, fu);
+end;
+
 # use characteristic polynomial in matrix groups
 CCInvFuncs.CharPol := function(r, tree)
   local fu;
@@ -146,7 +158,7 @@ BindGlobal("ConjugacyClassInvariants", function(G, args...)
   elif IsMatrixGroup(G) then
     funcs := [CCInvFuncs.NoticeReps, CCInvFuncs.CharPol, CCInvFuncs.MinPol, CCInvFuncs.ConjTest];
   else
-    funcs := [CCInvFuncs.NoticeReps, CCInvFuncs.ConjTest];
+    funcs := [CCInvFuncs.NoticeReps, CCInvFuncs.Order, CCInvFuncs.ConjTest];
   fi;
   tree := r.tree;
   find := function(tree, funcs)
