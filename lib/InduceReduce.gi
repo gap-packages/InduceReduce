@@ -563,7 +563,7 @@ InstallValue( IndRed , rec(
 ##
 InstallGlobalFunction( InduceReduce,
 function(GR,Opt)
-local TR, RedTR, H, ccsizesH, temp, it;
+local TR, RedTR, H, ccsizesH, temp, it, max, i, a, used;
 
     TR:=IndRed.GroupTools; # get group tools and reduce tools
     RedTR:=IndRed.ReduceTools;
@@ -596,25 +596,56 @@ local TR, RedTR, H, ccsizesH, temp, it;
     fi;
 
 
-    while Size(GR.Ir)<GR.k and not (GR.NumberOfPrimes=0 and GR.NumberOfCyclic=0) do
-        # if number of irr. characters=number of conjugacy classes,
-        # all irr. characters have been found.
+##      while Size(GR.Ir)<GR.k and not (GR.NumberOfPrimes=0 and GR.NumberOfCyclic=0) do
+##          # if number of irr. characters=number of conjugacy classes,
+##          # all irr. characters have been found.
+##  
+##          Opt.LLLOffset:=Opt.LLLOffset-1;
+##          # Opt.LLLOffset postpones the first LLL lattice reduction
+##  
+##          IndRed.FindElementary(GR,Opt); # find elementary subgroup
+##  
+##          IndRed.InitElementary(GR,TR); # determine information needed about elementary subgroup
+##  
+##  
+##          Info(InfoCTUnger, 1, "Induce/Restrict: Trying [|Z|, |P|, k(E)] = ",
+##              [ GR.orders[GR.IndexCyc],
+##                  GR.Elementary.n/GR.orders[GR.IndexCyc], GR.Elementary.k ]);
+##  
+##          IndRed.Induce(GR); # append induced characters to GR.B
+##  
+##          IndRed.Reduce(GR,RedTR,Opt); # reduce GR.B by GR.Ir and do lattice reduction
+##      od;
 
-        Opt.LLLOffset:=Opt.LLLOffset-1;
-        # Opt.LLLOffset postpones the first LLL lattice reduction
-
-        IndRed.FindElementary(GR,Opt); # find elementary subgroup
-
-        IndRed.InitElementary(GR,TR); # determine information needed about elementary subgroup
-
-
-        Info(InfoCTUnger, 1, "Induce/Restrict: Trying [|Z|, |P|, k(E)] = ",
-            [ GR.orders[GR.IndexCyc],
-                GR.Elementary.n/GR.orders[GR.IndexCyc], GR.Elementary.k ]);
-
-        IndRed.Induce(GR); # append induced characters to GR.B
-
-        IndRed.Reduce(GR,RedTR,Opt); # reduce GR.B by GR.Ir and do lattice reduction
+    GR.imported := true;
+    max := MaximalNonCyclicElementarySubgroups(GR.G);
+    used := [];
+    i := 1;
+    # first only use primes dividing current Gram determinant
+    while Size(GR.Ir)<GR.k and i <= Length(max) do
+      a := max[i];
+      if GR.foundDet mod a[2] = 0 then
+        Info(InfoCTUnger, 1, "Induce/Restrict: linear from class ",a[1]," (order ",
+                             GR.orders[a[1]^GR.perm],") p=",a[2]);
+        IndRed.ImportGeneralizedCharacters(GR, 
+                              InducedFromElementary(GR.G, a[1], a[2]));
+        IndRed.Reduce(GR,RedTR,Opt);
+        Add(used, a);
+      fi;
+      i := i+1;
+    od;
+    i := 1;
+    # if really needed use other primes
+    while Size(GR.Ir)<GR.k and i <= Length(max) do
+      a := max[i];
+      if not a in used then
+        Info(InfoCTUnger, 1, "Induce/Restrict: linear from class ",a[1]," (order ",
+                             GR.orders[a[1]^GR.perm],") p=",a[2]);
+        IndRed.ImportGeneralizedCharacters(GR, 
+                              InducedFromElementary(GR.G, a[1], a[2]));
+        IndRed.Reduce(GR,RedTR,Opt);
+      fi;
+      i := i+1;
     od;
 
     if Size(GR.Ir)>=GR.k then
