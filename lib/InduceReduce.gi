@@ -625,6 +625,14 @@ InstallMethod( Irr,
   local t, irr;
 
   t:= OrdinaryCharacterTable( G );
+
+  # Perhaps a cheaper method for 'G' exists but is not applicable.
+  if IsSolvableGroup( G ) and IsAbelian( SupersolvableResiduum( G ) ) then
+    irr:= IrrBaumClausen( G );
+    SetIrr( t, irr );
+    return irr;
+  fi;
+
   irr:= IrrUnger( G );
   SetIrr( t, irr );
   SetInfoText( t, "origin: Unger's algorithm" );
