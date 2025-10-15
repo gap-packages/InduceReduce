@@ -1,5 +1,10 @@
 This file describes changes in the `InduceReduce` package.
 
+1.2 (2025-10-15)
+  - In the `Irr` method that calls `IrrUnger`,
+    delegate to `IrrBaumClausen` if the group is abelian-by-supersolvable;
+    this is usually faster.
+
 1.1 (2025-07-16)
   - Added `IrrUnger` function which is also installed as method for `Irr`,
     so that the code in this package is automatically used when applicable
