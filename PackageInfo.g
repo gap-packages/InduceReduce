@@ -1,125 +1,103 @@
 #############################################################################
 ##  
-##  PackageInfo.g for the package `InduceReduce'              Jonathan Gruber
-##                                                            
-##  This file contains meta-information on the package. It is used by
-##  the package loading mechanism and the upgrade mechanism for the
-##  redistribution of the package via the GAP website.
+##  Demo PackageInfo.g for the GitHubPagesForGAP
 ##
 
 SetPackageInfo( rec(
 
-PackageName := "InduceReduce",
-Subtitle := "Unger's algorithm to compute character tables of finite groups",
-Version := "1.1",
-Date := "16/07/2025", # dd/mm/yyyy format
-License := "GPL-3.0-or-later",
+PackageName := "GitHubPagesForGAP",
+
+Subtitle := "A GitHub Pages generator for GAP packages",
+Version := "0.4",
+Date := "10/04/2025", # dd/mm/yyyy format
+License := "0BSD",
 
 Persons := [
   rec(
-    IsAuthor := true,
-    IsMaintainer := true,
-    FirstNames := "Jonathan",
-    LastName := "Gruber",
-    Email := "jonathan.gruber@fau.de",
-    Place := "Erlangen",
-    Institution := "University Erlangen-Nuremberg",
-    #PostalAddress := Concatenation(
-    #  ),
-  ),
-  rec(
-    IsAuthor := false,
-    IsMaintainer := true,
-    LastName := "Breuer",
-    FirstNames := "Thomas",
-    Email := "sam@math.rwth-aachen.de",
-    WWWHome := "https://www.math.rwth-aachen.de/~Thomas.Breuer",
-    Place := "Aachen",
-    Institution := "Lehrstuhl für Algebra und Zahlentheorie, RWTH Aachen",
+    LastName      := "Horn",
+    FirstNames    := "Max",
+    IsAuthor      := true,
+    IsMaintainer  := true,
+    Email         := "mhorn@rptu.de",
+    WWWHome       := "https://www.quendi.de/math",
+    GitHubUsername:= "fingolfin",
     PostalAddress := Concatenation(
-      "Thomas Breuer\n",
-      "Lehrstuhl für Algebra und Zahlentheorie\n",
-      "Pontdriesch 14/16\n",
-      "52062 Aachen\n",
-      "Germany" ),
+                       "Fachbereich Mathematik\n",
+                       "RPTU Kaiserslautern-Landau\n",
+                       "Gottlieb-Daimler-Straße 48\n",
+                       "67663 Kaiserslautern\n",
+                       "Germany" ),
+    Place         := "Kaiserslautern, Germany",
+    Institution   := "RPTU Kaiserslautern-Landau"
   ),
+
   rec(
-    IsAuthor := false,
-    IsMaintainer := true,
-    FirstNames := "Max",
-    LastName := "Horn",
-    Email := "mhorn@rptu.de",
-    WWWHome := "https://www.quendi.de/math",
-    GitHubUsername := "fingolfin",
-    Place := "Kaiserslautern, Germany",
-    Institution := "RPTU Kaiserslautern-Landau",
-    PostalAddress := Concatenation(
-      "Fachbereich Mathematik\n",
-      "RPTU Kaiserslautern-Landau\n",
-      "Gottlieb-Daimler-Straße 48\n",
-      "67663 Kaiserslautern\n",
-      "Germany" ),
+    LastName      := "Thor",
+    FirstNames    := "A. U.",
+    IsAuthor      := true,
+    IsMaintainer  := false,
+    #Email         := "author@example.com",
+  ),
+
+  rec(
+    LastName      := "Itor",
+    FirstNames    := "Jan",
+    IsAuthor      := false,
+    IsMaintainer  := true,
+    #Email         := "janitor@example.com",
   ),
 ],
 
-SourceRepository := rec(
-    Type := "git",
-    URL := "https://github.com/gap-packages/InduceReduce",
-),
-IssueTrackerURL := Concatenation( ~.SourceRepository.URL, "/issues" ),
-#SupportEmail := "TODO",
+Status := "other",
 
-PackageWWWHome :="https://gap-packages.github.io/InduceReduce/",
+# The following are not strictly necessary in your own PackageInfo.g
+# (in the sense that update.g only looks at the usual fields
+# like PackageWWWHome, ArchiveURL etc.). But they are convenient
+# if you use exactly the scheme for your package website that we propose.
+GithubUser := "gap-system",
+GithubRepository := ~.PackageName,
+GithubWWW := Concatenation("https://github.com/", ~.GithubUser, "/", ~.GithubRepository),
 
-PackageInfoURL := Concatenation( ~.PackageWWWHome, "PackageInfo.g" ),
+PackageWWWHome := Concatenation("https://", ~.GithubUser, ".github.io/", ~.GithubRepository, "/"),
 README_URL     := Concatenation( ~.PackageWWWHome, "README.md" ),
-ArchiveURL     := Concatenation( ~.SourceRepository.URL,
-                                 "/releases/download/v", ~.Version,
-                                 "/", ~.PackageName, "-", ~.Version ),
+PackageInfoURL := Concatenation( ~.PackageWWWHome, "PackageInfo.g" ),
+# The following assumes you are using the Github releases system. If not, adjust
+# it accordingly.
+ArchiveURL     := Concatenation(~.GithubWWW,
+                    "/releases/download/v", ~.Version, "/",
+                    ~.GithubRepository, "-", ~.Version),
 
-ArchiveFormats := ".tar.gz",
+ArchiveFormats := ".tar.gz .tar.bz2",
 
-Status := "deposited",
-
-AbstractHTML   :=  "This package provides an implementation of Unger's algorithm\
- to compute the character table of a finite group.",
+AbstractHTML := 
+  "This is a pseudo package that contains no actual\
+  <span class=\"pkgname\">GAP</span> code. Instead, it is a template for other\
+  GAP packages that allows to quickly setup GitHub Pages.",
 
 PackageDoc := rec(
-  BookName  := "InduceReduce",
+  BookName  := "GitHubPagesForGAP",
   ArchiveURLSubset := ["doc"],
-  HTMLStart := "doc/chap0_mj.html",
+  HTMLStart := "doc/chap0.html",
   PDFFile   := "doc/manual.pdf",
   SixFile   := "doc/manual.six",
-  LongTitle := "Computing Character Tables using Unger's algorithm",
+  LongTitle := "A GitHub Pages generator for GAP packages",
 ),
 
+# The following dependencies are fake and for testing / demo purposes
 Dependencies := rec(
-  GAP := ">= 4.9",
-  NeededOtherPackages := [ [ "GAPDoc", ">= 1.5" ] ],
-  SuggestedOtherPackages := [ ],
-  ExternalConditions := [ ],
+  GAP := ">=4.8.1",
+  NeededOtherPackages := [
+    ["GAPDoc", ">= 1.2"],
+    ["IO", ">= 4.1"],
+  ],
+  SuggestedOtherPackages := [["orb", ">= 4.2"]],
+  ExternalConditions := []
 ),
 
 AvailabilityTest := ReturnTrue,
 
-TestFile := "tst/testall.g",
-
-Keywords := [ "character table", "elementary subgroups", "induced characters" ],
-
-AutoDoc := rec(
-    entities := rec(
-        VERSION := ~.Version,
-        RELEASEYEAR := ~.Date{[7..10]},
-        RELEASEDATE := function(date)
-          local day, month, year, allMonths;
-          day := Int(date{[1,2]});
-          month := Int(date{[4,5]});
-          year := Int(date{[7..10]});
-          allMonths := [ "January", "February", "March", "April", "May", "June", "July",
-                         "August", "September", "October", "November", "December"];
-          return Concatenation(String(day)," ", allMonths[month], " ", String(year));
-        end(~.Date),
-    ),
-),
+Keywords := ["GitHub Pages", "GAP"]
 
 ));
+
+
