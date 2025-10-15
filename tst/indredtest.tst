@@ -47,5 +47,19 @@ X.8     2  1 -2 -1  . -A  A  .
 A = -E(8)-E(8)^3
   = -Sqrt(-2) = -i2
 
+# testing the `Irr` method from the package
+gap> G:= SmallGroup( 24, 6 );;
+gap> ct:= CharacterTable( G );;
+gap> irr:= Irr( ct );;
+gap> HasInfoText( ct );
+false
+gap> HasIsSupersolvableGroup( G );
+true
+gap> G:= MathieuGroup( 12 );;
+gap> ct:= CharacterTable( G );;
+gap> Irr( G );;
+gap> InfoText( ct );
+"origin: Unger's algorithm"
+
 #
 gap> STOP_TEST("indredtest.tst");
