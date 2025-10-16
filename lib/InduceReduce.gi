@@ -629,13 +629,12 @@ InstallMethod( Irr,
   # Perhaps a cheaper method for 'G' exists but is not applicable.
   if IsSolvableGroup( G ) and IsAbelian( SupersolvableResiduum( G ) ) then
     irr:= IrrBaumClausen( G );
-    SetIrr( t, irr );
-    return irr;
+  else
+    irr:= IrrUnger( G );
+    SetInfoText( t, "origin: Unger's algorithm" );
   fi;
-
-  irr:= IrrUnger( G );
   SetIrr( t, irr );
-  SetInfoText( t, "origin: Unger's algorithm" );
+  ComputeAllPowerMaps( t );
   return irr;
   end );
 

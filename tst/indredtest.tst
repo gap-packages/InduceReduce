@@ -55,11 +55,17 @@ gap> HasInfoText( ct );
 false
 gap> HasIsSupersolvableGroup( G );
 true
+gap> ForAll( PrimeDivisors( Size( ct ) ),
+>            p -> IsBound( ComputedPowerMaps( ct )[p] ) );
+true
 gap> G:= MathieuGroup( 12 );;
 gap> ct:= CharacterTable( G );;
 gap> Irr( G );;
 gap> InfoText( ct );
 "origin: Unger's algorithm"
+gap> ForAll( PrimeDivisors( Size( ct ) ),
+>            p -> IsBound( ComputedPowerMaps( ct )[p] ) );
+true
 
 #
 gap> STOP_TEST("indredtest.tst");
