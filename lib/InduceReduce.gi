@@ -634,9 +634,7 @@ InstallMethod( Irr,
     SetInfoText( t, "origin: Unger's algorithm" );
   fi;
   SetIrr( t, irr );
-  if IsBound( ComputeAllPowerMaps ) then
-    ValueGlobal( "ComputeAllPowerMaps" )( t );
-  fi;
+  ComputeAllPowerMaps( t );
   return irr;
   end );
 
