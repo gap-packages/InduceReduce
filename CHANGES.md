@@ -1,5 +1,9 @@
 This file describes changes in the `InduceReduce` package.
 
+1.3 (2025-10-16)
+  - Set power maps in the character tables whose irreducibles have been
+    computed by the `Irr` method that calls `IrrUnger`.
+
 1.2 (2025-10-15)
   - In the `Irr` method that calls `IrrUnger`,
     delegate to `IrrBaumClausen` if the group is abelian-by-supersolvable;
