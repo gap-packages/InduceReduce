@@ -509,7 +509,7 @@ InstallValue( IndRed , rec(
 ##
 InstallGlobalFunction( InduceReduce,
 function(GR,Opt)
-local TR, RedTR, H, ccsizesH, temp, it;
+local TR, RedTR, H, ccsizesH, temp, it, t, tElem, tInduce, tReduce;
 
     TR:=IndRed.GroupTools; # get group tools and reduce tools
     RedTR:=IndRed.ReduceTools;
@@ -529,7 +529,9 @@ local TR, RedTR, H, ccsizesH, temp, it;
         return GR.Ir;
     fi;
 
-
+    tElem := 0;
+    tInduce := 0;
+    tReduce := 0;
     while Size(GR.Ir)<GR.k and not (GR.NumberOfPrimes=0 and GR.NumberOfCyclic=0) do
         # if number of irr. characters=number of conjugacy classes,
         # all irr. characters have been found.
@@ -537,19 +539,33 @@ local TR, RedTR, H, ccsizesH, temp, it;
         Opt.LLLOffset:=Opt.LLLOffset-1;
         # Opt.LLLOffset postpones the first LLL lattice reduction
 
+        t := NanosecondsSinceEpoch();
         IndRed.FindElementary(GR,Opt); # find elementary subgroup
-
         IndRed.InitElementary(GR,TR); # determine information needed about elementary subgroup
-
+        t := NanosecondsSinceEpoch() - t;
+        Info(InfoCTUnger + InfoTiming, 2, "InduceReduce timing for Elementary: ", t/1000000., " ms");
+        tElem := tElem + t;
 
         Info(InfoCTUnger, 1, "Induce/Restrict: Trying [|Z|, |P|, k(E)] = ",
             [ GR.orders[GR.IndexCyc],
                 GR.Elementary.n/GR.orders[GR.IndexCyc], GR.Elementary.k ]);
 
+        t := NanosecondsSinceEpoch();
         IndRed.Induce(GR); # append induced characters to GR.B
+        t := NanosecondsSinceEpoch() - t;
+        Info(InfoCTUnger + InfoTiming, 2, "InduceReduce timing for Induce: ", t/1000000., " ms");
+        tInduce := tInduce + t;
 
+        t := NanosecondsSinceEpoch();
         IndRed.Reduce(GR,RedTR,Opt); # reduce GR.B by GR.Ir and do lattice reduction
+        t := NanosecondsSinceEpoch() - t;
+        Info(InfoCTUnger + InfoTiming, 2, "InduceReduce timing for Reduce: ", t/1000000., " ms");
+        tReduce := tReduce + t;
     od;
+    Info(InfoCTUnger + InfoTiming, 2, "InduceReduce total: ", (tElem + tInduce + tReduce)/1000000., " ms");
+    Info(InfoCTUnger + InfoTiming, 2, "        Elementary: ", tElem/1000000., " ms");
+    Info(InfoCTUnger + InfoTiming, 2, "            Induce: ", tInduce/1000000., " ms");
+    Info(InfoCTUnger + InfoTiming, 2, "            Reduce: ", tReduce/1000000., " ms");
 
     if Size(GR.Ir)>=GR.k then
         return GR.Ir;
