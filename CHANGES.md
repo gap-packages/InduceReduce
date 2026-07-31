@@ -1,5 +1,10 @@
 This file describes changes in the `InduceReduce` package.
 
+1.4 (2026-07-31)
+  - Dropped the dependency on the `GAPDoc` package, which was only needed
+    for building the manual.
+  - The test suite no longer requires the `SmallGrp` package.
+
 1.3 (2025-10-16)
   - Set power maps in the character tables whose irreducibles have been
     computed by the `Irr` method that calls `IrrUnger`.
