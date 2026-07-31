@@ -48,7 +48,7 @@ A = -E(8)-E(8)^3
   = -Sqrt(-2) = -i2
 
 # testing the `Irr` method from the package
-gap> G:= SmallGroup( 24, 6 );;
+gap> G:= DihedralGroup( 24 );;
 gap> ct:= CharacterTable( G );;
 gap> irr:= Irr( ct );;
 gap> HasInfoText( ct );
