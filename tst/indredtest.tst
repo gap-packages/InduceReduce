@@ -19,6 +19,45 @@ CharacterTable( Alt( [ 1 .. 6 ] ) )
 gap> ValuesAt( Irr( ct ), reps ) = ValuesAt( IrrDixonSchneider( G ), reps );
 true
 
+# A call with options runs the algorithm afresh,
+# also when it has run for the group before.
+gap> ref:= ValuesAt( IrrDixonSchneider( G ), reps );;
+gap> IsIrrA6:= irr -> ValuesAt( irr, reps ) = ref;;
+gap> opt:= rec( DoCyclicFirst:= true );;
+gap> G:= AlternatingGroup( 6 );;
+gap> IsIrrA6( IrrUnger( G, rec() ) );
+true
+gap> IsIrrA6( IrrUnger( G, rec() ) );
+true
+gap> G:= AlternatingGroup( 6 );;
+gap> IsIrrA6( Irr( CharacterTableUnger( G, opt ) ) );
+true
+gap> IsIrrA6( Irr( CharacterTableUnger( G, opt ) ) );
+true
+gap> G:= AlternatingGroup( 6 );;
+gap> IsIrrA6( IrrUnger( G ) );
+true
+gap> IsIrrA6( Irr( CharacterTableUnger( G, rec( Delta:= 1 ) ) ) );
+true
+gap> IsIrrA6( Irr( CharacterTableUnger( G ) ) );
+true
+
+# The options of every call take effect:
+# count the calls of the function that only `DoCyclicFirst` triggers.
+gap> InduceCyc:= IndRed.InduceCyc;;
+gap> n:= 0;;
+gap> IndRed.InduceCyc:= function( GR ) n:= n + 1; InduceCyc( GR ); end;;
+gap> G:= AlternatingGroup( 6 );;
+gap> IrrUnger( G, rec() );; n;
+0
+gap> IrrUnger( G, opt );; n;
+1
+gap> IrrUnger( G, opt );; n;
+2
+gap> IrrUnger( G, rec() );; n;
+2
+gap> IndRed.InduceCyc:= InduceCyc;;
+
 #
 gap> G:= GeneralLinearGroup( 2, 3 );;
 gap> reps:= List( ConjugacyClasses( G ), Representative );;
