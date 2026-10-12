@@ -5,6 +5,11 @@ This file describes changes in the `InduceReduce` package.
 - The test suite no longer assumes an order of the conjugacy classes of a
   character table, or that `Irr` selects the method of this package.
   Both assumptions fail when the `CCTab` package is loaded.
+- Fixed `IrrUnger( G, opts )` and `CharacterTableUnger( G, opts )`, which
+  returned wrong characters or raised an error when called a second time
+  for the same group. Every call with options now runs the algorithm anew.
+  `UngerRecord( G )` is now the finished record of the run with the default
+  options.
 
 ## 1.4 (2026-07-31)
 
