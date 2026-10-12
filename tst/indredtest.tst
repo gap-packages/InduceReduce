@@ -1,56 +1,65 @@
 gap> START_TEST("indredtest.tst");
 
+# Neither the order of the classes of a character table nor the order of
+# its irreducibles is specified.
+# Compare the values at given group elements, as sets.
+gap> ValuesAt:= function( irr, elms )
+>      local ccl, pos;
+>      ccl:= ConjugacyClasses( UnderlyingCharacterTable( irr[1] ) );
+>      pos:= List( elms, g -> PositionProperty( ccl, C -> g in C ) );
+>      return Set( List( irr, chi -> ValuesOfClassFunction( chi ){ pos } ) );
+>    end;;
+
 #############################################################################
 # testing the main function
-gap> ct:=CharacterTableUnger(AlternatingGroup(6));
+gap> G:= AlternatingGroup( 6 );;
+gap> reps:= List( ConjugacyClasses( G ), Representative );;
+gap> ct:= CharacterTableUnger( G );
 CharacterTable( Alt( [ 1 .. 6 ] ) )
-gap> Display(ct);
-CT1
-
-     2  3  3  .  .  2  .  .
-     3  2  .  2  2  .  .  .
-     5  1  .  .  .  .  1  1
-
-       1a 2a 3a 3b 4a 5a 5b
-
-X.1     1  1  1  1  1  1  1
-X.2     5  1  2 -1 -1  .  .
-X.3     9  1  .  .  1 -1 -1
-X.4     8  . -1 -1  .  A *A
-X.5     8  . -1 -1  . *A  A
-X.6    10 -2  1  1  .  .  .
-X.7     5  1 -1  2 -1  .  .
-
-A = -E(5)^2-E(5)^3
-  = (1+Sqrt(5))/2 = 1+b5
+gap> ValuesAt( Irr( ct ), reps ) = ValuesAt( IrrDixonSchneider( G ), reps );
+true
 
 #
-gap> ct:=CharacterTableUnger(GeneralLinearGroup(2,3));
+gap> G:= GeneralLinearGroup( 2, 3 );;
+gap> reps:= List( ConjugacyClasses( G ), Representative );;
+gap> ct:= CharacterTableUnger( G );
 CharacterTable( GL(2,3) )
-gap> Display(ct);
-CT2
+gap> ValuesAt( Irr( ct ), reps ) = ValuesAt( IrrDixonSchneider( G ), reps );
+true
+gap> OrdersClassRepresentatives( ct )
+>    = List( ConjugacyClasses( ct ), C -> Order( Representative( C ) ) );
+true
+gap> SizesCentralizers( ct )
+>    = List( ConjugacyClasses( ct ), C -> Size( G ) / Size( C ) );
+true
 
-     2  4  1  4  1  3  3  3  2
-     3  1  1  1  1  .  .  .  .
+# The classes of the table may be ordered differently from those of the
+# group: store the identity class last in the group, the table has it first.
+gap> H:= GroupWithGenerators( GeneratorsOfGroup( G ) );;
+gap> SetConjugacyClasses( H,
+>        List( Concatenation( reps{ [ 2 .. Length( reps ) ] }, reps{ [ 1 ] } ),
+>              g -> ConjugacyClass( H, g ) ) );
+gap> ConjugacyClasses( CharacterTable( H ) ) = ConjugacyClasses( H );
+false
+gap> ValuesAt( IrrUnger( H ), reps ) = ValuesAt( IrrDixonSchneider( G ), reps );
+true
+gap> ct:= CharacterTableUnger( H );;
+gap> ValuesAt( Irr( ct ), reps ) = ValuesAt( IrrDixonSchneider( G ), reps );
+true
+gap> OrdersClassRepresentatives( ct )
+>    = List( ConjugacyClasses( ct ), C -> Order( Representative( C ) ) );
+true
 
-       1a 6a 2a 3a 4a 8a 8b 2b
-
-X.1     1  1  1  1  1  1  1  1
-X.2     3  .  3  . -1 -1 -1  1
-X.3     3  .  3  . -1  1  1 -1
-X.4     2 -1  2 -1  2  .  .  .
-X.5     1  1  1  1  1 -1 -1 -1
-X.6     2  1 -2 -1  .  A -A  .
-X.7     4 -1 -4  1  .  .  .  .
-X.8     2  1 -2 -1  . -A  A  .
-
-A = -E(8)-E(8)^3
-  = -Sqrt(-2) = -i2
-
-# testing the `Irr` method from the package
+# testing the `Irr` method from the package;
+# call it directly, `Irr( G )` may select a method from elsewhere
 gap> G:= DihedralGroup( 24 );;
 gap> ct:= CharacterTable( G );;
-gap> irr:= Irr( ct );;
+gap> ForAny( ApplicableMethod( Irr, [ G, 0 ], 0, "all" ),
+>            f -> IsIdenticalObj( f, IndRed.Irr ) );
+true
+gap> irr:= IndRed.Irr( G, 0 );;
+gap> irr = Irr( ct );
+true
 gap> HasInfoText( ct );
 false
 gap> HasIsSupersolvableGroup( G );
@@ -60,11 +69,16 @@ gap> ForAll( PrimeDivisors( Size( ct ) ),
 true
 gap> G:= MathieuGroup( 12 );;
 gap> ct:= CharacterTable( G );;
-gap> Irr( G );;
+gap> irr:= IndRed.Irr( G, 0 );;
+gap> irr = Irr( ct );
+true
 gap> InfoText( ct );
 "origin: Unger's algorithm"
 gap> ForAll( PrimeDivisors( Size( ct ) ),
 >            p -> IsBound( ComputedPowerMaps( ct )[p] ) );
+true
+gap> reps:= List( ConjugacyClasses( G ), Representative );;
+gap> ValuesAt( irr, reps ) = ValuesAt( IrrDixonSchneider( G ), reps );
 true
 
 #

@@ -1,5 +1,11 @@
 This file describes changes in the `InduceReduce` package.
 
+## Unreleased
+
+- The test suite no longer assumes an order of the conjugacy classes of a
+  character table, or that `Irr` selects the method of this package.
+  Both assumptions fail when the `CCTab` package is loaded.
+
 ## 1.4 (2026-07-31)
 
 - Dropped the dependency on the `GAPDoc` package, which was only needed
