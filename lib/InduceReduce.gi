@@ -618,10 +618,10 @@ InstallMethod( IrrUnger,
 ##
 #M  Irr( <G>, 0 ) . . . . . . . . . . . . . . . . . .  call Unger's algorithm
 ##
-InstallMethod( Irr,
-  "for a group and zero, use Unger's algorithm",
-  [ IsGroup, IsZeroCyc ],
-  function( G, zero )
+##  Another package may install a method that is selected instead,
+##  `IndRed.Irr` calls this one in any case.
+##
+IndRed.Irr:= function( G, zero )
   local t, irr;
 
   t:= OrdinaryCharacterTable( G );
@@ -636,7 +636,12 @@ InstallMethod( Irr,
   SetIrr( t, irr );
   ComputeAllPowerMaps( t );
   return irr;
-  end );
+  end;
+
+InstallMethod( Irr,
+  "for a group and zero, use Unger's algorithm",
+  [ IsGroup, IsZeroCyc ],
+  IndRed.Irr );
 
 
 #############################################################################
