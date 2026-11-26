@@ -566,32 +566,16 @@ end );
 
 #############################################################################
 ##
-#M  UngerRecord( <G> )
+#F IndRed.Run( <G>, <Options> )
 ##
-##  Compute a record that contains data used by Unger's algorithm.
+## runs the algorithm on a new record and returns it.
+## The record is finished then: `InduceReduce` and `IndRed.tinI` give wrong
+## results when called with it again.
 ##
-InstallMethod( UngerRecord,
-    [ "IsGroup" ],
-    IndRed.Init );
+IndRed.Run:= function( G, Options )
+    local GR, Opt;
 
-
-#############################################################################
-##
-#M  IrrUnger( <G>[, <options>] )  . . . . . . . . . .  call Unger's algorithm
-##
-##  Compute the irreducible characters of <G>, using Unger's algorithm.
-##
-InstallMethod( IrrUnger,
-    [ "IsGroup" ],
-    G -> IrrUnger( G, rec() ) );
-
-InstallMethod( IrrUnger,
-    [ "IsGroup", "IsRecord" ],
-    function( G, Options )
-    local t, GR, Opt;
-
-    GR:= UngerRecord( G );
-    t:= GR.C;
+    GR:= IndRed.Init( G );
 
     Opt:= ShallowCopy( CTUngerDefaultOptions );
     if IsBound( Options.DoCyclicFirst ) and IsBool( Options.DoCyclicFirst ) then
@@ -611,7 +595,36 @@ InstallMethod( IrrUnger,
     InduceReduce( GR, Opt ); # do the induce-reduce algorithm
 
     IndRed.tinI( GR ); # adjusts the sorting of vectors in `GR.Ir`
-    return List( GR.Ir, x -> Character( t, x ) );
+    return GR;
+    end;
+
+
+#############################################################################
+##
+#M  UngerRecord( <G> )
+##
+##  The record of the run with the default options.
+##
+InstallMethod( UngerRecord,
+    [ "IsGroup" ],
+    G -> IndRed.Run( G, rec() ) );
+
+
+#############################################################################
+##
+#M  IrrUnger( <G>[, <options>] )  . . . . . . . . . .  call Unger's algorithm
+##
+##  Compute the irreducible characters of <G>, using Unger's algorithm.
+##  A call with <options> runs the algorithm anew.
+##
+InstallMethod( IrrUnger,
+    [ "IsGroup" ],
+    G -> UngerRecord( G ).Ir );
+
+InstallMethod( IrrUnger,
+    [ "IsGroup", "IsRecord" ],
+    function( G, Options )
+    return IndRed.Run( G, Options ).Ir;
     end );
 
 #############################################################################
@@ -655,11 +668,10 @@ InstallGlobalFunction( CharacterTableUnger, function(G, Options...)
     local GR, T;
 
     if Length( Options ) = 0 then
-      IrrUnger( G );
+      GR:= UngerRecord( G );
     else
-      IrrUnger( G, Options[1] );
+      GR:= IndRed.Run( G, Options[1] );
     fi;
-    GR:= UngerRecord( G );
 
     # Create a character table independent of the one stored in `G`.
     T:=rec();
