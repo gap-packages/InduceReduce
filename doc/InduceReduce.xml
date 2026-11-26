@@ -44,7 +44,7 @@
             <ManSection>
                 <Func Name="CharacterTableUnger" Arg="G [ , Opt ]"/>
                 <Description>
-                    This  function computes the character table of a finite group using Unger's algorithm. The argument <Arg>G</Arg> must be a finite group, the argument <Arg>Opt</Arg> must be a record which sets some options for the algorithm (more details in Section <Ref Sect="options"/> below).
+                    This  function computes the character table of a finite group using Unger's algorithm. The argument <Arg>G</Arg> must be a finite group, the argument <Arg>Opt</Arg> must be a record which sets some options for the algorithm (more details in Section <Ref Sect="options"/> below). Without <Arg>Opt</Arg>, the irreducible characters are computed once and stored in <Arg>G</Arg>; with <Arg>Opt</Arg>, every call computes them anew.
                     <Example><![CDATA[
 gap> G:=AlternatingGroup(6);;
 gap> CharacterTableUnger(G);
@@ -68,6 +68,7 @@ gap> CharacterTableUnger(G);
 #I  Induce/Restrict: Trying [|Z|, |P|, k(E)] = [ 3, 1, 3 ]
 CharacterTable( Alt( [ 1 .. 6 ] ) )
 
+gap> G:=AlternatingGroup(6);;
 gap> SetInfoLevel(InfoCTUnger,2);
 gap> CharacterTableUnger(G);
 #I  Induce/Restrict: group with 7 conjugacy classes.

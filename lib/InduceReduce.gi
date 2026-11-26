@@ -514,6 +514,12 @@ local TR, RedTR, H, ccsizesH, temp, it;
     TR:=IndRed.GroupTools; # get group tools and reduce tools
     RedTR:=IndRed.ReduceTools;
 
+    if Size(GR.Ir)>=GR.k then
+        # only the trivial group; `IndRed.Reduce` fails on its induced
+        # characters, which reduce to a lattice of rank 0
+        return GR.Ir;
+    fi;
+
     if Opt.DoCyclicFirst = true then # if option Opt.DoCyclicFirst is set,
         # induce from all cyclic groups first and reduce
 
@@ -524,11 +530,6 @@ local TR, RedTR, H, ccsizesH, temp, it;
         GR.InduceCyclic:=ListWithIdenticalEntries(GR.k,false);
         GR.NumberOfCyclic:=0;
     fi;
-
-    if Size(GR.Ir)>=GR.k then
-        return GR.Ir;
-    fi;
-
 
     while Size(GR.Ir)<GR.k and not (GR.NumberOfPrimes=0 and GR.NumberOfCyclic=0) do
         # if number of irr. characters=number of conjugacy classes,

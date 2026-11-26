@@ -58,6 +58,11 @@ gap> IrrUnger( G, rec() );; n;
 2
 gap> IndRed.InduceCyc:= InduceCyc;;
 
+# The trivial group has its irreducibles before any induction.
+gap> G:= TrivialGroup( IsPermGroup );;
+gap> List( IrrUnger( G, rec( DoCyclicFirst:= true ) ), ValuesOfClassFunction );
+[ [ 1 ] ]
+
 #
 gap> G:= GeneralLinearGroup( 2, 3 );;
 gap> reps:= List( ConjugacyClasses( G ), Representative );;
