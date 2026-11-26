@@ -10,6 +10,11 @@ This file describes changes in the `InduceReduce` package.
   for the same group. Every call with options now runs the algorithm anew.
   `UngerRecord( G )` is now the finished record of the run with the default
   options.
+- Fixed `IrrUnger` and `CharacterTableUnger` with option `DoCyclicFirst`,
+  which raised an error for the trivial group.
+- The manual states that `CharacterTableUnger( G )` stores its result in
+  `G`, and its `InfoCTUnger` example no longer shows a trace for a stored
+  result.
 
 ## 1.4 (2026-07-31)
 
