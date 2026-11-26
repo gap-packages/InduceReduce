@@ -1,6 +1,6 @@
 This file describes changes in the `InduceReduce` package.
 
-## Unreleased
+## 1.5 (2026-11-26)
 
 - The test suite no longer assumes an order of the conjugacy classes of a
   character table, or that `Irr` selects the method of this package.
